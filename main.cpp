@@ -1,6 +1,6 @@
 // classes example
 #include <iostream>
-#include "rectangle.h"
+#include <fstream>
 using namespace std;
 
 
