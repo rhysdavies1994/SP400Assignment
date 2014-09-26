@@ -1,6 +1,8 @@
 //Standard Includes
 #include <iostream>
 #include <fstream>
+#include <string>
+
 
 //Namespaces
 using namespace std;
@@ -18,10 +20,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	
-	string instruction,image,outputFolder;
-    Pixel *pOne = new Pixel(1,2,3);
-    cout << pOne->toString() << pOne->toString();
-    newLine();
+	string instruction,image,output;
     
     //Handle command line parameters
     //First argument is instruction
@@ -32,7 +31,7 @@ int main(int argc, char **argv)
 	{
 		instruction = argv[1];
 		image = argv[2];
-		outputFolder = argv[argc-1];
+		output = argv[argc-1];
 	}
 	else
 	{
@@ -43,13 +42,13 @@ int main(int argc, char **argv)
     //Test Command Arguements
 	cout << "Arg 1 = " <<instruction << "\n";
 	cout << "Arg 2 = " <<image << "\n";
-	cout << "Arg 3 = " <<outputFolder << "\n";
+	cout << "Arg 3 = " <<output << "\n";
     
-	//	Your program should perform the following operations
+    //	Your program should perform the following operations
 	//copy
 	if(instruction=="copy")
 	{
-		copy(image, outputFolder);
+		copy(image, output);
         
 	}
     
@@ -57,7 +56,7 @@ int main(int argc, char **argv)
 	else if(instruction =="flip")
 	{
 		flip();
-    
+        
 	}
     
     //resize
@@ -77,9 +76,33 @@ int main(int argc, char **argv)
 	
 }
 
-void copy(string image, string outputFolder)
+void copy(string image, string output)
 {
 	cout << "Copy function\n";
+    
+    //File IO
+    string line;
+    ifstream inputFile (image);
+    ofstream outputFile;
+    outputFile.open (output);
+    
+    
+    if (inputFile.is_open())
+    {
+        while ( getline (inputFile,line) )
+        {
+            outputFile << line << '\n';
+        }
+        inputFile.close();
+    }
+    else
+    {
+        cout << "Unable to open file";
+    }
+    
+    outputFile.close();
+    
+    
 }
 
 void flip()
