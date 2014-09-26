@@ -127,18 +127,19 @@ void copy(string image, string output)
     inputFile = fopen(image.c_str(), "r");
     outputFile = fopen(output.c_str(),"w");
 
-    fscanf(inputFile ,"%5s\n",magicNumber);
+    fscanf(inputFile ,"%s\n",magicNumber);
     fscanf(inputFile ,"%d %d\n",&amountRows,&amountColumns);
-    fscanf(inputFile ,"%d",&maxRGB);
+    fscanf(inputFile ,"%d\n",&maxRGB);
     
     fprintf(outputFile,"%s\n",magicNumber);
     fprintf(outputFile ,"%d %d\n",amountRows,amountColumns);
-    fprintf(outputFile ,"%d",maxRGB);
+    fprintf(outputFile ,"%d\n",maxRGB);
     
     while(!feof(inputFile))
     {
-        fscanf(inputFile, "%s\n",currentLine);
-        fprintf(outputFile, "%s\n",currentLine);
+        fgets(currentLine, 1024, inputFile);
+        //fscanf(inputFile, "%s\n",currentLine);
+        fprintf(outputFile, "%s",currentLine);
     
         for(i=0;i<70;i++)
         {
