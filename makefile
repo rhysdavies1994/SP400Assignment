@@ -1,14 +1,15 @@
 #include <stdio.h>
-main=
-CFLAGS=gcc -ansi -pedantic -Wall -g
+main=main
+CFLAGS=g++ -pedantic -Wall -g
 obj=$(main).o
-cc=gcc -c -g
+cc=g++ -c -g
 
 $(main):    $(obj)
 	$(CFLAGS) -o $(main) $(obj)
 
-$(main).o:	$(main).c	$(main).h
-	$(cc) $(main).c
+$(main).o:	$(main).cpp
+	$(cc) $(main).cpp
+
 
 clean:
 	rm -rf $(obj) $(main)
