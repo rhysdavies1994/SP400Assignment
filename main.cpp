@@ -2,7 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include <stdio.h>      /* printf, scanf, NULL */
+#include <stdlib.h>     /* malloc, free, rand */
 
 //Namespaces
 using namespace std;
@@ -76,33 +77,88 @@ int main(int argc, char **argv)
 	
 }
 
+//void copy(string image, string output)
+//{
+//	cout << "Copy function\n";
+//    
+//    //File IO
+//    string line;
+//    ifstream inputFile (image);
+//    ofstream outputFile;
+//    outputFile.open (output);
+//    
+//    
+//    if (inputFile.is_open())
+//    {
+//        while ( getline (inputFile,line) )
+//        {
+//            outputFile << line << '\n';
+//        }
+//        inputFile.close();
+//    }
+//    else
+//    {
+//        cout << "Unable to open file";
+//    }
+//    
+//    outputFile.close();
+//    
+//    
+//}
+
 void copy(string image, string output)
 {
-	cout << "Copy function\n";
+    cout << "Copy Function\n";
     
-    //File IO
-    string line;
-    ifstream inputFile (image);
-    ofstream outputFile;
-    outputFile.open (output);
+    FILE *inputFile;
+    FILE *outputFile;
+    Pixel *currentPixel;
+    int inRed,inGreen,inBlue;
+    int amountRows,amountColumns;
+    int maxRGB;
+    char *magicNumber;
+    char *currentLine;
+    int i=0;
     
+    magicNumber=(char*)malloc(sizeof(char)*5);
+    currentLine=(char*)malloc(sizeof(char)*70);
     
-    if (inputFile.is_open())
+    //Open Files
+    inputFile = fopen(image.c_str(), "r");
+    outputFile = fopen(output.c_str(),"w");
+
+    fscanf(inputFile ,"%5s\n",magicNumber);
+    fscanf(inputFile ,"%d %d\n",&amountRows,&amountColumns);
+    fscanf(inputFile ,"%d",&maxRGB);
+    
+    fprintf(outputFile,"%s\n",magicNumber);
+    fprintf(outputFile ,"%d %d\n",amountRows,amountColumns);
+    fprintf(outputFile ,"%d",maxRGB);
+    
+    while(!feof(inputFile))
     {
-        while ( getline (inputFile,line) )
+        fscanf(inputFile, "%s\n",currentLine);
+        fprintf(outputFile, "%s\n",currentLine);
+    
+        for(i=0;i<70;i++)
         {
-            outputFile << line << '\n';
+            currentLine[i]='\0';
         }
-        inputFile.close();
-    }
-    else
-    {
-        cout << "Unable to open file";
+        free(currentLine);
+        magicNumber=(char*)malloc(sizeof(char)*70);
+    
     }
     
-    outputFile.close();
+    //fscanf(inputFile , " %d %d %d",inRed,inGreen,inBlue);
+    //currentPixel= new Pixel(inRed,inGreen,inBlue);
+    //fprintf(outputFile, "%s",currentPixel->toString());
     
     
+    
+    
+    //Close Files
+    fclose(inputFile);
+    fclose(outputFile);
 }
 
 void flip()

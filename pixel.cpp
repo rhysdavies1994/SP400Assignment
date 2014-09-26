@@ -27,7 +27,7 @@ string Pixel::toString()
 {
     stringstream value;
     
-    value << red << " " << green << " " <<blue <<" ";
+    value << " " << red << " " << green << " " <<blue <<" ";
     
     return value.str();
 }
