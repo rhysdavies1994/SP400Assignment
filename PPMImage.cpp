@@ -13,18 +13,18 @@ PPMImage::PPMImage()
 	magicNumber=(char*)malloc(sizeof(char)*5);
 	strcpy(magicNumber,"P3");
 	comments=NULL;
-	amountRows=0;
-	amountColumns=0;
+	numberColumns=0;
+	numberRows=0;
 	pixels=NULL;
 	maxRGB=0;
 }
 
-PPMImage::PPMImage(int inAmountRows,int inAmountColumns,int inMaxRGB, Pixel ***inPixels)
+PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB, Pixel ***inPixels)
 {
 	magicNumber=(char*)malloc(sizeof(char)*5);
 	strcpy(magicNumber,"P3");
-	amountRows=inAmountRows;
-	amountColumns=inAmountColumns;
+	numberColumns=inNumberColumns;
+	numberRows=inNumberRows;
 	maxRGB=inMaxRGB;
 	pixels=inPixels;
 	
@@ -75,7 +75,7 @@ void PPMImage::initFromFile(string inputFileName)
 			//otherwise the current line is the amount of rows and columns
 			else
 			{
-				sscanf(currentLine ,"%d %d",&amountRows,&amountColumns);
+				sscanf(currentLine ,"%d %d",&numberColumns,&numberRows);
 				
 				isComment=false;
 			}
@@ -93,10 +93,17 @@ void PPMImage::initFromFile(string inputFileName)
 		
 		
 		//Allocate Memory for 2D array of pixels [rows][columns]
-		pixels = new Pixel**[amountRows];
-		for(int j=0;j<amountRows;j++)
+		//pixels = new Pixel**[numberColumns];
+		//for(int j=0;j<numberColumns;j++)
+		//{
+		//	pixels[j]=new Pixel*[numberRows];
+		//	
+		//}
+
+		pixels = new Pixel**[numberColumns];
+		for(int j=0;j<numberColumns;j++)
 		{
-			pixels[j]=new Pixel*[amountColumns];
+			pixels[j]=new Pixel*[numberRows];
 			
 		}
 		
@@ -128,10 +135,10 @@ void PPMImage::initFromFile(string inputFileName)
 				
 				
 				//Use current pixel
-				pixels[currentRow][currentColumn]=new Pixel(currentPixel->getRed(), currentPixel->getGreen(), currentPixel->getBlue());
+				pixels[currentColumn][currentRow]=new Pixel(currentPixel->getRed(), currentPixel->getGreen(), currentPixel->getBlue());
 							
 				//increment rows/columns
-				if(currentColumn<amountColumns-1)
+				if(currentColumn<numberColumns-1)
 				{
 					currentColumn++;
 				}
@@ -165,15 +172,15 @@ string PPMImage::toString()
 	stringstream value;
 	
 	value << magicNumber <<"\n";
-	value << amountRows << " " <<amountColumns << "\n";
+	value << numberColumns << " " <<numberRows << "\n";
 	value << maxRGB <<"\n";
 	
-	for(int i=0;i<amountRows;i++)
+	for(int x=0;x<numberColumns;x++)
 	{
 		
-		for(int j=0;j<amountColumns;j++)
+		for(int y=0;y<numberRows;y++)
 		{
-			value << (pixels[i][j]->toString()).c_str() <<"\n";
+			value << (pixels[x][y]->toString()).c_str() <<"\n";
 		}
 	}
 	
@@ -184,12 +191,12 @@ string PPMImage::pixelsToString()
 {
 	stringstream value;
 	
-	for(int i=0;i<amountRows;i++)
+	for(int x=0;x<numberColumns;x++)
 	{
 		
-		for(int j=0;j<amountColumns;j++)
+		for(int y=0;y<numberRows;y++)
 		{
-			value << (pixels[i][j]->toString()).c_str() <<"\n";
+			value << (pixels[x][y]->toString()).c_str() <<"\n";
 		}
 	}
 	
@@ -206,14 +213,14 @@ char* PPMImage::getComments()
 	return comments;
 }
 
-int PPMImage::getAmountRows()
+int PPMImage::getNumberColumns()
 {
-	return amountRows;
+	return numberColumns;
 }
 
-int PPMImage::getAmountColumns()
+int PPMImage::getNumberRows()
 {
-	return amountColumns;
+	return numberRows;
 }
 
 int PPMImage::getMaxRGB()
@@ -226,9 +233,9 @@ Pixel*** PPMImage::getPixels()
 	return pixels;
 }
 
-Pixel* PPMImage::getPixel(int row, int column)
+Pixel* PPMImage::getPixel(int column, int row)
 {
-	return pixels[row][column];
+	return pixels[column][row];
 }
 
 PPMImage::~PPMImage()

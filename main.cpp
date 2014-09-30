@@ -16,6 +16,10 @@ using namespace std;
 
 
 
+//Faults:
+//Stack Based Buffer-overflow: 
+//	1) when read in magic string, have fixed size of magicNumber, overflow this
+//	2)
 
 
 //Program Takes command line parameters (instructions, one or more images, output filename)
@@ -114,7 +118,8 @@ int main(int argc, char **argv)
     //tile
 	else if(strcmp(instruction,"tile")==0)
 	{
-		
+
+		tile(argc,inputs,outputFile);
 	}
 	fclose(outputFile);
 	delete(firstPPM);
@@ -175,21 +180,22 @@ void flip(const char *direction, PPMImage *image, FILE *output)
 	stringstream value;
 	
 	value << image->getMagicNumber() <<"\n";
-	value << image->getAmountRows() << " " << image->getAmountColumns() << "\n";
+	value << image->getNumberColumns() << " " << image->getNumberRows() << "\n";
 	value << image->getMaxRGB() <<"\n";
 	
 	if(strcmp(direction,"h")==0)
 	{
 		
-		printf("AmountColumns = %d\n",image->getAmountColumns());
-		printf("AmountRows = %d\n",image->getAmountRows());	
+		printf("NumberRows = %d\n",image->getNumberRows());
+		printf("NumberColumns = %d\n",image->getNumberColumns());	
 	
-		for(int i=image->getAmountRows()-1;i>=0;i--)
-		{
+		
 			
-			for(int j=image->getAmountColumns()-1;j>=0;j--)
+			for(int y=image->getNumberRows()-1;y>=0;y--)
 			{
-				value << (image->getPixel(i,j)->toString()).c_str() <<"\n";
+			for(int x=image->getNumberColumns()-1;x>=0;x--)
+		{
+				value << (image->getPixel(x,y)->toString()).c_str() <<"\n";
 			}
 		}
 		
@@ -197,18 +203,15 @@ void flip(const char *direction, PPMImage *image, FILE *output)
 	}
 	else if(strcmp(direction,"v")==0)
 	{
-	 printf("AmountColumns = %d\n",image->getAmountColumns());
-		printf("AmountRows = %d\n",image->getAmountRows());	
+	 	printf("NumberRows = %d\n",image->getNumberRows());
+		printf("NumberColumns = %d\n",image->getNumberColumns());	
 	
-		for(int i=0;i<=image->getAmountRows()-1;i++)
-		{		
-			for(int j=0;j<=image->getAmountColumns()-1;j++)
+		
+		for(int y=0;y<=image->getNumberRows()-1;y++)
+		{
+			for(int x=image->getNumberColumns()-1;x>=0;x--)
 			{
-			
-			
-					//int currentRow=image->getAmountRows()-1-j;
-					value << (image->getPixel(i,j)->toString()).c_str() <<"\n";
-			
+					value << (image->getPixel(x,y)->toString()).c_str() <<"\n";
 			}
 		}
 	}
@@ -220,14 +223,45 @@ void flip(const char *direction, PPMImage *image, FILE *output)
 	fprintf(output,"%s", (value.str()).c_str());
 }
 
-void resize(int scaleFactor, PPMImage *image, FILE *output)
+void resize(double scaleFactor, PPMImage *image, FILE *output)
 {
 	cout << "Resize function\n";
+	
+	stringstream value;
+	int newNumberColumns=(((double)image->getNumberColumns()) *scaleFactor)+0.5;
+	int newNumberRows=(((double)image->getNumberRows()) *scaleFactor)+0.5;
+
+	value << image->getMagicNumber() <<"\n";
+	value << image->getNumberColumns() << " " << image->getNumberRows() << "\n";
+	value << image->getMaxRGB() <<"\n";
+
+	//Do nearest neighbour resize stuff
+	//tech-algorithm.com/articles/nearest-neighbour-image-scaling/
+	
+	
+
 }
 
-void tile(PPMImage **images, FILE *output)
+void tile(int numberImages, PPMImage **images, FILE *output)
 {
 	cout << "Tile function\n";
+
+	//get magic number
+	//get width=longest image width, height=all images + height
+	//get highest maxRGB value
+	//print rows of image 1 then 2 then 3 etc. if column != max width then fill rest of columns in row with 0 0 0 pixels until at max width
+	//
+
+	stringstream value;
+
+	int newNumberColumns=(((double)image->getNumberColumns()) *scaleFactor)+0.5;
+	int newNumberRows=(((double)image->getNumberRows()) *scaleFactor)+0.5;
+
+	value << image->getMagicNumber() <<"\n";
+	value << image->getNumberColumns() << " " << image->getNumberRows() << "\n";
+	value << image->getMaxRGB() <<"\n";
+
+
 }
 
 void newLine()
