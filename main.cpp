@@ -143,11 +143,11 @@ int main(int argc, char **argv)
 	fclose(outputFile);
 	
 	
-	for(int i=2; i<argc-2;i++)
-	{
-		int index=i-2;
-		free(inputs[index]);
-	}
+	//for(int i=2; i<argc-2;i++)
+	//{
+	//	int index=i-2;
+	//	free(inputs[index]);
+	//}
 	free(inputs);
 	
 	
@@ -297,8 +297,25 @@ void tile(int amountImages, PPMImage **images, FILE *output)
 	
 	for(int i=0;i<amountImages;i++)
 	{
-		value << images[i]->pixelsToString();
+		for(int y=0;y<images[i]->getNumberRows();y++)
+		{		
+			for(int x=0;x<numberColumns;x++)
+			{
+				int imageNumberColumns = images[i]->getNumberColumns();				
+				if(imageNumberColumns > x)
+				{
+					value << images[i]->getPixel(x,y)->toString() <<"\n";
+				}
+				else
+				{
+					value << " 0 0 0 \n";
+				}
+			}
+		}
+		//value << images[i]->pixelsToString();
 	}
+
+	fprintf(output,"%s",(value.str()).c_str());
 	
 }
 
