@@ -10,13 +10,14 @@
 #define _Main_h
 //Namespaces
 using namespace std;
+#include "PPMImage.h"
 
 int main(int argc,char **argv);
 
-void copy(string image, string outputFolder);
-void flip();
-void resize();
-void tile();
+void copy(PPMImage *image, FILE *output);
+void flip(const char *direction, PPMImage *image, FILE *output);
+void resize(int scaleFactor, PPMImage *image, FILE *output);
+void tile(PPMImage **images, FILE *output);
 void newLine();
 
 #endif

@@ -1,3 +1,5 @@
+#define C_LINELENGTH 70
+
 //Standard Includes
 #include <iostream>
 #include <fstream>
@@ -16,23 +18,41 @@ using namespace std;
 
 
 
+
 //Program Takes command line parameters (instructions, one or more images, output filename)
 
 int main(int argc, char **argv)
 {
 	
-	string instruction,image,output;
+	string instruction, instructionParameter, outputFileName, inputFileName;
+	string *inputs = new string[argc-3];
+	PPMImage *firstPPM;
+	bool hasInstructionParameter=false;
     
     //Handle command line parameters
     //First argument is instruction
     //Last argument is output folder
     //A secondary argument may be associated with instruction e.g flip h
     //Middle arguments are input files
-	if(argc==4)
+	if(argc >= 4)
 	{
 		instruction = argv[1];
-		image = argv[2];
-		output = argv[argc-1];
+		
+		for(int i=2; i<argc-2;i++)
+		{
+			inputs[i]=argv[i];
+			
+			if(instruction=="flip" || instruction=="resize")
+			{
+				hasInstructionParameter=true;
+				instructionParameter=inputs[2];
+			
+			}
+		
+			
+		}
+
+		outputFileName = argv[argc-1];
 	}
 	else
 	{
@@ -41,53 +61,75 @@ int main(int argc, char **argv)
 	}
     
     //Test Command Arguements
-	cout << "Arg 1 = " <<instruction << "\n";
-	cout << "Arg 2 = " <<image << "\n";
-	cout << "Arg 3 = " <<output << "\n";
+//	cout << "Arg 1 = " <<instruction << "\n";
+//	cout << "Arg 2 = " <<image << "\n";
+//	cout << "Arg 3 = " <<output << "\n";
     
+		
+	FILE *outputFile;
+	outputFile = fopen(outputFileName.c_str(),"w");
+
+	
     //	Your program should perform the following operations
 	//copy
 	if(instruction=="copy")
 	{
-		copy(image, output);
-        
+		//Create a PPMImage class from input
+		firstPPM=new PPMImage();
+		firstPPM->initFromFile(inputs[2]);
+
+		copy(firstPPM, outputFile);
+		
 	}
     
     //flip
 	else if(instruction =="flip")
 	{
-		flip();
+		//Create a PPMImage class from input
+		firstPPM=new PPMImage();
+		firstPPM->initFromFile(inputs[3]);
+
+		if(instructionParameter=="h" || instructionParameter=="v")
+		{
+		flip(instructionParameter.c_str(), firstPPM,outputFile);
+		}
+		else
+		{
+			cout << "Flip needs 'h' or 'v' for horizontal or vertical flip";
+		}
         
 	}
     
     //resize
 	else if(instruction == "resize")
 	{
-		resize();
+		
 	}
     
     //tile
 	else if(instruction == "tile")
 	{
-		tile();
+		
 	}
-	
+	fclose(outputFile);
+	delete(firstPPM);
 	
 	return 0;
 	
 }
 
+//Easy way to copy ppm - just copy every line to new file
 //void copy(string image, string output)
 //{
 //	cout << "Copy function\n";
-//    
+//
 //    //File IO
 //    string line;
 //    ifstream inputFile (image);
 //    ofstream outputFile;
 //    outputFile.open (output);
-//    
-//    
+//
+//
 //    if (inputFile.is_open())
 //    {
 //        while ( getline (inputFile,line) )
@@ -100,79 +142,63 @@ int main(int argc, char **argv)
 //    {
 //        cout << "Unable to open file";
 //    }
-//    
+//
 //    outputFile.close();
-//    
-//    
+//
+//
 //}
 
-void copy(string image, string output)
+void copy(PPMImage *image, FILE *output)
 {
     cout << "Copy Function\n";
+	
+	fprintf(output,"%s",(image->toString()).c_str());
     
-    FILE *inputFile;
-    FILE *outputFile;
-    Pixel *currentPixel;
-    int inRed,inGreen,inBlue;
-    int amountRows,amountColumns;
-    int maxRGB;
-    char *magicNumber;
-    char *currentLine;
-    int i=0;
-    
-    magicNumber=(char*)malloc(sizeof(char)*5);
-    currentLine=(char*)malloc(sizeof(char)*70);
-    
-    //Open Files
-    inputFile = fopen(image.c_str(), "r");
-    outputFile = fopen(output.c_str(),"w");
-
-    fscanf(inputFile ,"%s\n",magicNumber);
-    fscanf(inputFile ,"%d %d\n",&amountRows,&amountColumns);
-    fscanf(inputFile ,"%d\n",&maxRGB);
-    
-    fprintf(outputFile,"%s\n",magicNumber);
-    fprintf(outputFile ,"%d %d\n",amountRows,amountColumns);
-    fprintf(outputFile ,"%d\n",maxRGB);
-    
-    while(!feof(inputFile))
-    {
-        fgets(currentLine, 1024, inputFile);
-        //fscanf(inputFile, "%s\n",currentLine);
-        fprintf(outputFile, "%s",currentLine);
-    
-        for(i=0;i<70;i++)
-        {
-            currentLine[i]='\0';
-        }
-        free(currentLine);
-        magicNumber=(char*)malloc(sizeof(char)*70);
-    
-    }
-    
-    //fscanf(inputFile , " %d %d %d",inRed,inGreen,inBlue);
-    //currentPixel= new Pixel(inRed,inGreen,inBlue);
-    //fprintf(outputFile, "%s",currentPixel->toString());
-    
-    
-    
-    
-    //Close Files
-    fclose(inputFile);
-    fclose(outputFile);
 }
 
-void flip()
+void flip(const char *direction, PPMImage *image, FILE *output)
 {
 	cout << "Flip function\n";
+	
+	stringstream value;
+	
+	value << image->getMagicNumber() <<"\n";
+	value << image->getAmountRows() << " " << image->getAmountColumns() << "\n";
+	value << image->getMaxRGB() <<"\n";
+	
+	if(strcmp(direction,"h")==0)
+	{
+		
+		
+		for(int i=image->getAmountRows()-1;i>0;i--)
+		{
+			
+			for(int j=0; j<image->getAmountColumns()-1;j++)
+			{
+				value << (image->getPixel(i,j)->toString()).c_str() <<"\n";
+			}
+		}
+		
+		
+	}
+	else if(strcmp(direction,"v")==0)
+	{
+	 
+	}
+	else
+	{
+		printf("Invalid Direction for Flip");
+	}
+	
+	fprintf(output,"%s", (value.str()).c_str());
 }
 
-void resize()
+void resize(int scaleFactor, PPMImage *image, FILE *output)
 {
 	cout << "Resize function\n";
 }
 
-void tile()
+void tile(PPMImage **images, FILE *output)
 {
 	cout << "Tile function\n";
 }

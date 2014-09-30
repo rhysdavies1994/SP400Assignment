@@ -23,6 +23,36 @@ Pixel::Pixel(int inRed, int inGreen,int inBlue)
     blue=inBlue;
 }
 
+void Pixel::setRed(int inRed)
+{
+	red=inRed;
+}
+
+void Pixel::setGreen(int inGreen)
+{
+	green=inGreen;
+}
+
+void Pixel::setBlue(int inBlue)
+{
+	blue=inBlue;
+}
+
+int Pixel::getRed()
+{
+	return red;
+}
+
+int Pixel::getGreen()
+{
+	return green;
+}
+
+int Pixel::getBlue()
+{
+	return blue;
+}
+
 string Pixel::toString()
 {
     stringstream value;
