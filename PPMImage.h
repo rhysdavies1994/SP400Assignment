@@ -10,11 +10,12 @@
 #define ____PPMImage__
 
 #include <fstream>
-#include <string>
+#include <string.h>
 #include <stdio.h>      /* printf, scanf, NULL */
 #include <stdlib.h>     /* malloc, free, rand */
 #include <sstream>
 #include <iostream>
+#include <stdio.h>
 
 #include "pixel.h"
 using namespace std;

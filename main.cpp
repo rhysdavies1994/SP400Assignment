@@ -18,14 +18,16 @@ using namespace std;
 
 
 
-
 //Program Takes command line parameters (instructions, one or more images, output filename)
 
 int main(int argc, char **argv)
 {
 	
-	string instruction, instructionParameter, outputFileName, inputFileName;
-	string *inputs = new string[argc-3];
+	char *instruction, *instructionParameter, *outputFileName, *inputFileName;
+	char **inputs = (char**)malloc(sizeof(char*)*(argc-3));
+	
+		
+	
 	PPMImage *firstPPM;
 	bool hasInstructionParameter=false;
     
@@ -38,14 +40,17 @@ int main(int argc, char **argv)
 	{
 		instruction = argv[1];
 		
-		for(int i=2; i<argc-2;i++)
-		{
-			inputs[i]=argv[i];
+		for(int i=2; i<=argc-2;i++)
+		{	
+			int index=i-2;			
+			int length=strlen(argv[i]);
+			inputs[index]=(char*)malloc(sizeof(char)*length);
+			inputs[index]=argv[i];
 			
-			if(instruction=="flip" || instruction=="resize")
+			if(strcmp(instruction,"flip")==0 || strcmp(instruction,"resize")==0)
 			{
 				hasInstructionParameter=true;
-				instructionParameter=inputs[2];
+				instructionParameter=inputs[0];
 			
 			}
 		
@@ -67,52 +72,59 @@ int main(int argc, char **argv)
     
 		
 	FILE *outputFile;
-	outputFile = fopen(outputFileName.c_str(),"w");
+	outputFile = fopen(outputFileName,"w");
 
 	
     //	Your program should perform the following operations
 	//copy
-	if(instruction=="copy")
+	if(strcmp(instruction,"copy")==0)
 	{
 		//Create a PPMImage class from input
 		firstPPM=new PPMImage();
-		firstPPM->initFromFile(inputs[2]);
+		firstPPM->initFromFile(inputs[0]);
 
 		copy(firstPPM, outputFile);
 		
 	}
     
     //flip
-	else if(instruction =="flip")
+	else if(strcmp(instruction,"flip")==0)
 	{
 		//Create a PPMImage class from input
 		firstPPM=new PPMImage();
-		firstPPM->initFromFile(inputs[3]);
+		firstPPM->initFromFile(inputs[1]);
 
-		if(instructionParameter=="h" || instructionParameter=="v")
+		if(strcmp(instruction,"flip")==0 || strcmp(instruction,"resize")==0)
 		{
-		flip(instructionParameter.c_str(), firstPPM,outputFile);
+		flip(instructionParameter, firstPPM,outputFile);
 		}
 		else
 		{
-			cout << "Flip needs 'h' or 'v' for horizontal or vertical flip";
+			cout << "Flip needs 'h' or 'v' for horizontal or vertical flip\n";
 		}
         
 	}
     
     //resize
-	else if(instruction == "resize")
+	else if(strcmp(instruction , "resize")==0)
 	{
 		
 	}
     
     //tile
-	else if(instruction == "tile")
+	else if(strcmp(instruction,"tile")==0)
 	{
 		
 	}
 	fclose(outputFile);
 	delete(firstPPM);
+	
+	for(int i=2; i<argc-2;i++)
+		{	
+		free(inputs[i]);			
+		}
+	free(inputs);
+
 	
 	return 0;
 	
@@ -169,11 +181,13 @@ void flip(const char *direction, PPMImage *image, FILE *output)
 	if(strcmp(direction,"h")==0)
 	{
 		
-		
-		for(int i=image->getAmountRows()-1;i>0;i--)
+		printf("AmountColumns = %d\n",image->getAmountColumns());
+		printf("AmountRows = %d\n",image->getAmountRows());	
+	
+		for(int i=image->getAmountRows()-1;i>=0;i--)
 		{
 			
-			for(int j=0; j<image->getAmountColumns()-1;j++)
+			for(int j=image->getAmountColumns()-1;j>=0;j--)
 			{
 				value << (image->getPixel(i,j)->toString()).c_str() <<"\n";
 			}
@@ -183,7 +197,20 @@ void flip(const char *direction, PPMImage *image, FILE *output)
 	}
 	else if(strcmp(direction,"v")==0)
 	{
-	 
+	 printf("AmountColumns = %d\n",image->getAmountColumns());
+		printf("AmountRows = %d\n",image->getAmountRows());	
+	
+		for(int i=0;i<=image->getAmountRows()-1;i++)
+		{		
+			for(int j=0;j<=image->getAmountColumns()-1;j++)
+			{
+			
+			
+					//int currentRow=image->getAmountRows()-1-j;
+					value << (image->getPixel(i,j)->toString()).c_str() <<"\n";
+			
+			}
+		}
 	}
 	else
 	{

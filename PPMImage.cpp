@@ -107,45 +107,29 @@ void PPMImage::initFromFile(string inputFileName)
 		//Read end of input file, write to output file
 		while(!feof(inputFile))
 		{
-			
-			fgets(currentLine, C_LINELENGTH, inputFile);
-			
-			
-			char *currentWord;
-			currentWord = strtok(currentLine," ");
-			while (currentWord != NULL)
-			{
+
 				//DEBUGGING: print current word and line
 				//printf("currentword:%s\n",currentWord);
 				//printf("Curr Row:%d, Col:%d\n",currentRow,currentColumn);
 				
+				int red=0;
+				int green=0;
+				int blue=0;
+
+				fscanf(inputFile," %d %d %d ",&red,&green,&blue);
+
 				//Create new pixel
 				currentPixel=new Pixel();
 				
 				//Set up current pixel RGB Values
-				currentPixel->setRed(atoi(currentWord));
-				
-				currentWord = strtok (NULL, " ");
-				currentPixel->setGreen(atoi(currentWord));
-				
-				currentWord = strtok (NULL, " ");
-				currentPixel->setBlue(atoi(currentWord));
+				currentPixel->setRed(red);
+				currentPixel->setGreen(green);				
+				currentPixel->setBlue(blue);
 				
 				
 				//Use current pixel
 				pixels[currentRow][currentColumn]=new Pixel(currentPixel->getRed(), currentPixel->getGreen(), currentPixel->getBlue());
-				
-				
-				//Theres a problem here *** 
-				//Get Start of next pixel RGB Values
-				currentWord = strtok (NULL, " ");
-				
-				//if currentWord is a new line, set it to null to start processing next line
-				if(strcmp(currentWord,"\n")==0)
-				{
-					currentWord=NULL;
-				}
-				
+							
 				//increment rows/columns
 				if(currentColumn<amountColumns-1)
 				{
@@ -160,18 +144,6 @@ void PPMImage::initFromFile(string inputFileName)
 				
 				//delete pixel from memory
 				delete(currentPixel);
-			}
-			
-			//fprintf(outputFile, "%s",currentLine);
-			
-			
-			//Clear currentLine from memory, then allocate for next use
-			for(int i=0;i<C_LINELENGTH;i++)
-			{
-				currentLine[i]='\0';
-			}
-			free(currentLine);
-			currentLine=(char*)malloc(sizeof(char)*C_LINELENGTH);
 			
 		}
 	}
