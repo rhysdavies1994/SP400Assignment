@@ -203,6 +203,8 @@ string PPMImage::pixelsToString()
 	return value.str();
 }
 
+
+
 char* PPMImage::getMagicNumber()
 {
 	return magicNumber;
