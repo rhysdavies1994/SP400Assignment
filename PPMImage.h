@@ -33,6 +33,7 @@ private:
 	
 public:
 	PPMImage();
+	PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB);
 	PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB, Pixel ***inPixels);
 	~PPMImage();
 	void initFromFile(string inputFileName);
@@ -46,6 +47,7 @@ public:
 	int getMaxRGB();
 	Pixel***  getPixels();
 	Pixel* getPixel(int column, int row);
+	void setPixel(Pixel* pixel, int column, int row);
 	
 	
 	

@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[1]);
 		
-		if(strcmp(instruction,"flip")==0 || strcmp(instruction,"resize")==0)
+		if(strcmp(instructionParameter,"h")==0 || strcmp(instructionParameter,"v")==0)
 		{
 			flip(instructionParameter, firstPPM,outputFile);
 		}
@@ -114,7 +114,13 @@ int main(int argc, char **argv)
     //resize
 	else if(strcmp(instruction , "resize")==0)
 	{
-		
+		//Create a PPMImage class from input
+		firstPPM=new PPMImage();
+		firstPPM->initFromFile(inputs[1]);
+
+		double scaleFactor=atof(instructionParameter);
+
+		resize(scaleFactor,firstPPM,outputFile);
 	}
     
     //tile
@@ -248,16 +254,35 @@ void resize(double scaleFactor, PPMImage *image, FILE *output)
 	cout << "Resize function\n";
 	
 	stringstream value;
+	int newX=0;
+	int newY=0; 
+	//Calculate new width and height
 	int newNumberColumns=(((double)image->getNumberColumns()) *scaleFactor)+0.5;
 	int newNumberRows=(((double)image->getNumberRows()) *scaleFactor)+0.5;
 	
-	value << image->getMagicNumber() <<"\n";
-	value << image->getNumberColumns() << " " << image->getNumberRows() << "\n";
-	value << image->getMaxRGB() <<"\n";
+	//Create object for scaled Image to be stored in
+	PPMImage *scaledImage=new PPMImage(newNumberColumns, newNumberRows,image->getMaxRGB());
+
+	//Do nearest neighbour resize
+	//Learnt from: tech-algorithm.com/articles/nearest-neighbour-image-scaling/
 	
-	//Do nearest neighbour resize stuff
-	//tech-algorithm.com/articles/nearest-neighbour-image-scaling/
-	
+	for(int y=0;y<newNumberRows;y++)
+	{
+		for(int x=0;x<newNumberColumns;x++)
+			{
+				newX = (int)floor(x/scaleFactor);
+				newY = (int)floor(y/scaleFactor);
+				scaledImage->setPixel(image->getPixel(newX,newY),x,y);
+			}
+	}
+
+	//Print values to file
+	value << scaledImage->getMagicNumber() <<"\n";
+	value << scaledImage->getNumberColumns() << " " << scaledImage->getNumberRows() << "\n";
+	value << scaledImage->getMaxRGB() <<"\n";
+	value << scaledImage->pixelsToString();
+	fprintf(output,"%s",(value.str()).c_str());
+
 	
 	
 }

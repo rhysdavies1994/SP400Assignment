@@ -24,6 +24,7 @@ public:
     Pixel();
     Pixel(int inRed,int inGreen,int inBlue);
     string toString();
+	void setRGB(int inRed, int inGreen, int inBlue);
 	void setRed(int inRed);
 	void setGreen(int inGreen);
 	void setBlue(int inBlue);

@@ -23,6 +23,13 @@ Pixel::Pixel(int inRed, int inGreen,int inBlue)
     blue=inBlue;
 }
 
+void Pixel::setRGB(int inRed, int inGreen, int inBlue)
+{
+	red = inRed;
+	green = inGreen;
+	blue = inBlue;
+}
+
 void Pixel::setRed(int inRed)
 {
 	red=inRed;

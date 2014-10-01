@@ -11,6 +11,7 @@
 //Namespaces
 using namespace std;
 #include "PPMImage.h"
+#include <math.h>
 
 int main(int argc,char **argv);
 
