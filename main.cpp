@@ -47,8 +47,8 @@ int main(int argc, char **argv)
 		for(int i=2; i<=argc-2;i++)
 		{
 			int index=i-2;
-			int length=strlen(argv[i]);
-			inputs[index]=(char*)malloc(sizeof(char)*length);
+//			int length=strlen(argv[i]);
+//			inputs[index]=(char*)malloc(sizeof(char)*length);
 			inputs[index]=argv[i];
 			
 			if(strcmp(instruction,"flip")==0 || strcmp(instruction,"resize")==0)
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 		firstPPM->initFromFile(inputs[0]);
 		
 		copy(firstPPM, outputFile);
-		delete(firstPPM);
+		delete firstPPM;
 	}
     
     //flip
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 			cout << "Flip needs 'h' or 'v' for horizontal or vertical flip\n";
 		}
 		
-		delete(firstPPM);
+		delete firstPPM;
         
 	}
     
@@ -121,6 +121,8 @@ int main(int argc, char **argv)
 		double scaleFactor=atof(instructionParameter);
 
 		resize(scaleFactor,firstPPM,outputFile);
+        
+        delete firstPPM;
 	}
     
     //tile
@@ -141,9 +143,9 @@ int main(int argc, char **argv)
 		
 		for(int i=0; i<amountImages;i++)
 		{
-			delete(images[i]);
+			delete images[i];
 		}
-		delete(images);
+		delete images;
 	}
 	
 	fclose(outputFile);
@@ -161,35 +163,7 @@ int main(int argc, char **argv)
 	
 }
 
-//Easy way to copy ppm - just copy every line to new file
-//void copy(string image, string output)
-//{
-//	cout << "Copy function\n";
-//
-//    //File IO
-//    string line;
-//    ifstream inputFile (image);
-//    ofstream outputFile;
-//    outputFile.open (output);
-//
-//
-//    if (inputFile.is_open())
-//    {
-//        while ( getline (inputFile,line) )
-//        {
-//            outputFile << line << '\n';
-//        }
-//        inputFile.close();
-//    }
-//    else
-//    {
-//        cout << "Unable to open file";
-//    }
-//
-//    outputFile.close();
-//
-//
-//}
+
 
 void copy(PPMImage *image, FILE *output)
 {

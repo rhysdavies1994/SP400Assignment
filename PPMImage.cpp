@@ -10,7 +10,7 @@
 
 PPMImage::PPMImage()
 {
-	magicNumber=(char*)malloc(sizeof(char)*5);
+	
 	strcpy(magicNumber,"P3");
 	comments=NULL;
 	numberColumns=0;
@@ -19,10 +19,36 @@ PPMImage::PPMImage()
 	maxRGB=0;
 }
 
+PPMImage::~PPMImage()
+{
+	
+	free(comments);
+	comments=NULL;
+	
+    for(int j=0;j<numberColumns;j++)
+	{
+		
+		for(int i=0;i<numberRows;i++)
+		{
+            delete pixels[j][i];
+            pixels[j][i]=NULL;
+		}
+        
+        delete pixels[j];
+        pixels[j]=NULL;
+	}
+    
+    
+	delete pixels;
+	pixels=NULL;
+	
+	
+}
+
 PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB)
 {
-	magicNumber=(char*)malloc(sizeof(char)*5);	
-	magicNumber=strcpy(magicNumber,"P3");
+	
+	strcpy(magicNumber,"P3");
 	comments=NULL;
 	numberColumns=inNumberColumns;
 	numberRows=inNumberRows;
@@ -43,7 +69,7 @@ PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB)
 
 PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB, Pixel ***inPixels)
 {
-	magicNumber=(char*)malloc(sizeof(char)*5);
+	
 	strcpy(magicNumber,"P3");
 	numberColumns=inNumberColumns;
 	numberRows=inNumberRows;
@@ -52,9 +78,7 @@ PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB, Pixel ***i
 	
 }
 
-// TO DO
-//CONVERT THIS "COPY" FUNCTION CODE INTO A WORKING FUNCTION
-//TO MAKE A PPM CLASS FROM A FILE
+
 void PPMImage::initFromFile(string inputFileName)
 {
 	FILE *inputFile;
@@ -268,16 +292,4 @@ void PPMImage::setPixel(Pixel* pixel, int column, int row)
 }
 
 
-PPMImage::~PPMImage()
-{
-	free(magicNumber);
-	magicNumber=NULL;
-	
-	free(comments);
-	comments=NULL;
-	
-	delete(pixels);
-	pixels=NULL;
-	
-	
-}
+
