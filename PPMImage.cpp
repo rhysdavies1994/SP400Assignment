@@ -12,7 +12,6 @@ PPMImage::PPMImage()
 {
 	
 	strcpy(magicNumber,"P3");
-	comments=NULL;
 	numberColumns=0;
 	numberRows=0;
 	pixels=NULL;
@@ -22,8 +21,6 @@ PPMImage::PPMImage()
 PPMImage::~PPMImage()
 {
 	
-	free(comments);
-	comments=NULL;
 	
     for(int j=0;j<numberColumns;j++)
 	{
@@ -49,7 +46,6 @@ PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB)
 {
 	
 	strcpy(magicNumber,"P3");
-	comments=NULL;
 	numberColumns=inNumberColumns;
 	numberRows=inNumberRows;
 
@@ -105,8 +101,7 @@ void PPMImage::initFromFile(string inputFileName)
 	//Get Magic Number, make sure its P3
     fscanf(inputFile ,"%s\n",magicNumber);
 	
-	if(strcmp(magicNumber,"P3")==0)
-	{
+	
 		//Parse Through comments until at amount of rows and columns
 		do
 		{
@@ -116,7 +111,7 @@ void PPMImage::initFromFile(string inputFileName)
 			//if the currentline is a comment, copy to output file
 			if(currentLine[0] == '#')
 			{
-				//fprintf(outputFile,"%s",currentLine);
+				strcat(comments,currentLine);
 			}
 			//otherwise the current line is the amount of rows and columns
 			else
@@ -199,11 +194,7 @@ void PPMImage::initFromFile(string inputFileName)
 				delete(currentPixel);
 			
 		}
-	}
-	else
-	{
-		printf("This is not a PPM File");
-	}
+	
 	
 	free(currentLine);
 	currentLine=NULL;
@@ -218,6 +209,7 @@ string PPMImage::toString()
 	stringstream value;
 	
 	value << magicNumber <<"\n";
+    value << comments <<"\n";
 	value << numberColumns << " " <<numberRows << "\n";
 	value << maxRGB <<"\n";
 	for(int y=0;y<numberRows;y++)

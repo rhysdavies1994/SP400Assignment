@@ -24,7 +24,7 @@ class PPMImage
 {
 private:
 	char magicNumber[3];
-	char* comments;
+	char comments[20];
 	int numberColumns;
 	int numberRows;
 	int maxRGB;

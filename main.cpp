@@ -180,6 +180,7 @@ void flip(const char *direction, PPMImage *image, FILE *output)
 	stringstream value;
 	
 	value << image->getMagicNumber() <<"\n";
+    value << image->getComments() <<"\n";
 	value << image->getNumberColumns() << " " << image->getNumberRows() << "\n";
 	value << image->getMaxRGB() <<"\n";
 	
@@ -252,6 +253,7 @@ void resize(double scaleFactor, PPMImage *image, FILE *output)
 
 	//Print values to file
 	value << scaledImage->getMagicNumber() <<"\n";
+    value << scaledImage->getComments() <<"\n";
 	value << scaledImage->getNumberColumns() << " " << scaledImage->getNumberRows() << "\n";
 	value << scaledImage->getMaxRGB() <<"\n";
 	value << scaledImage->pixelsToString();
@@ -287,10 +289,12 @@ void tile(int amountImages, PPMImage **images, FILE *output)
 		}
 		
 		numberRows = numberRows + images[i]->getNumberRows();
+        
+        
 	}
 	
 	
-	value << "P3\n";
+	value << images[0]->getMagicNumber();
 	value << numberColumns << " " << numberRows << "\n";
 	value << maxRGB <<"\n";
 	
