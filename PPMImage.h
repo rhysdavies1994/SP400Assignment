@@ -47,7 +47,7 @@ public:
 	int getMaxRGB();
 	Pixel***  getPixels();
 	Pixel* getPixel(int column, int row);
-	void setPixel(Pixel* pixel, int column, int row);
+	void setPixel(int inRed, int inGreen, int inBlue, int column, int row);
 	
 	
 	

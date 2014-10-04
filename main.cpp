@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	char **inputs = (char**)malloc(sizeof(char*)*5);
 	
 	
-	PPMImage *firstPPM;
+	
 	bool hasInstructionParameter=false;
     
     //Handle command line parameters
@@ -111,10 +111,12 @@ int main(int argc, char **argv)
 	if(strcmp(instruction,"copy")==0)
 	{
 		//Create a PPMImage class from input
+		PPMImage *firstPPM;
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[0]);
 		
 		copy(firstPPM, outputFile);
+		
 		delete firstPPM;
 	}
     
@@ -122,6 +124,7 @@ int main(int argc, char **argv)
 	else if(strcmp(instruction,"flip")==0)
 	{
 		//Create a PPMImage class from input
+		PPMImage *firstPPM;
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[1]);
 		
@@ -142,6 +145,7 @@ int main(int argc, char **argv)
 	else if(strcmp(instruction , "resize")==0)
 	{
 		//Create a PPMImage class from input
+		PPMImage *firstPPM;
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[1]);
 
@@ -172,7 +176,7 @@ int main(int argc, char **argv)
 		{
 			delete images[i];
 		}
-		delete images;
+		delete[] images;
 	}
 	
 	fclose(outputFile);
@@ -289,7 +293,12 @@ void resize(double scaleFactor, PPMImage *image, FILE *output)
 			{
 				newX = (int)floor(x/scaleFactor);
 				newY = (int)floor(y/scaleFactor);
-				scaledImage->setPixel(image->getPixel(newX,newY),x,y);
+				
+				int currentRed=image->getPixel(newX,newY)->getRed();
+				int currentGreen=image->getPixel(newX,newY)->getGreen();
+				int currentBlue=image->getPixel(newX,newY)->getBlue();
+				
+				scaledImage->setPixel(currentRed, currentGreen, currentBlue,x,y);
 			}
 	}
 
@@ -301,7 +310,7 @@ void resize(double scaleFactor, PPMImage *image, FILE *output)
 	value << scaledImage->pixelsToString();
 	fprintf(output,"%s",(value.str()).c_str());
 
-	
+	delete scaledImage;
 	
 }
 

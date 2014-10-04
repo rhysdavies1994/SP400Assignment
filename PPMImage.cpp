@@ -11,7 +11,8 @@
 PPMImage::PPMImage()
 {
 	
-	strcpy(magicNumber,"P3");
+	strcpy(magicNumber,"");
+	strcpy(comments,"");
 	numberColumns=0;
 	numberRows=0;
 	pixels=NULL;
@@ -31,12 +32,12 @@ PPMImage::~PPMImage()
             pixels[j][i]=NULL;
 		}
         
-        delete pixels[j];
+        delete[] pixels[j];
         pixels[j]=NULL;
 	}
     
     
-	delete pixels;
+	delete[] pixels;
 	pixels=NULL;
 	
 	
@@ -46,6 +47,7 @@ PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB)
 {
 	
 	strcpy(magicNumber,"P3");
+	strcpy(comments,"");
 	numberColumns=inNumberColumns;
 	numberRows=inNumberRows;
 
@@ -54,9 +56,10 @@ PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB)
 	for(int j=0;j<numberColumns;j++)
 	{
 		pixels[j]=new Pixel*[numberRows];
+		
 		for(int i=0;i<numberRows;i++)
 		{
-		pixels[j][i]=new Pixel();
+			pixels[j][i]=new Pixel();
 		}
 	}
 	maxRGB=inMaxRGB;
@@ -278,9 +281,11 @@ Pixel* PPMImage::getPixel(int column, int row)
 	return pixels[column][row];
 }
 
-void PPMImage::setPixel(Pixel* pixel, int column, int row)
+void PPMImage::setPixel(int inRed, int inGreen, int inBlue, int column, int row)
 {
-	pixels[column][row] = pixel;
+	pixels[column][row]->setRed(inRed);
+	pixels[column][row]->setGreen(inGreen);
+	pixels[column][row]->setBlue(inBlue);
 }
 
 
