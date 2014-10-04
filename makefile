@@ -1,8 +1,8 @@
 #include <stdio.h>
 main=main
-CFLAGS=g++ -pedantic -Wall -g
+CFLAGS=g++ -pedantic -Wall -ggdb
 obj=$(main).o pixel.o PPMImage.o
-cc=g++ -c -g
+cc=g++ -c -ggdb
 
 $(main):    $(obj)
 	$(CFLAGS) -o $(main) $(obj)

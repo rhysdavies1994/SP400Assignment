@@ -16,20 +16,47 @@ using namespace std;
 
 
 
-//Faults:
-//Stack Based Buffer-overflow:
-//	1) when read in magic string, have fixed size of magicNumber, overflow this
-//	2)
+/*Faults:
+////////////////////////////////////////////////////////////////////////
+
+//Simple
+1.Exactly two (2) stack-based buffer overflows.
+	1) when read in magic number string, have fixed size of 10 characters, overflow this
+	2) when read in comments string, has fixed size of 20 characters
+
+2.Exactly two (2) heap-based buffer overflows.
+	1) when taking input parameters, if more than 5 between input and output file then heap based overflow occurs
+	2)
+
+3.Exactly two (2) format string vulnerabilities.
+	1) When printing magic number to output file
+	2) when printing comments to output file
+	
+4.Exactly three (3) memory leaks.
+
+5.Exactly one (1) access-after-free of memory.
+
+6.Exactly one (1) double-free.
+
+//Advanced
+Memory Access
+
+Code Injection
 
 
+////////////////////////////////////////////////////////////////////////
+*/
 //Program Takes command line parameters (instructions, one or more images, output filename)
 
 int main(int argc, char **argv)
 {
 	
 	char *instruction, *instructionParameter, *outputFileName, *inputFileName;
-	char **inputs = (char**)malloc(sizeof(char*)*(argc-3));
 	
+	//Vulnerability 2.1
+	//working 
+	//char **inputs = (char**)malloc(sizeof(char*)*(argc-3));
+	char **inputs = (char**)malloc(sizeof(char*)*5);
 	
 	
 	PPMImage *firstPPM;
@@ -151,11 +178,6 @@ int main(int argc, char **argv)
 	fclose(outputFile);
 	
 	
-	//for(int i=2; i<argc-2;i++)
-	//{
-	//	int index=i-2;
-	//	free(inputs[index]);
-	//}
 	free(inputs);
 	
 	
@@ -169,7 +191,27 @@ void copy(PPMImage *image, FILE *output)
 {
     cout << "Copy Function\n";
 	
-	fprintf(output,"%s",(image->toString()).c_str());
+	//3a
+	fprintf(output,image->getMagicNumber());
+	fprintf(output,"\n");
+	
+	//3b
+	fprintf(output,image->getComments());
+	fprintf(output,"%d %d\n",image->getNumberColumns(), image->getNumberRows());
+	fprintf(output,"%d\n",image->getMaxRGB());
+	
+
+	for(int y=0;y<image->getNumberRows();y++)
+	{
+		for(int x=0;x<image->getNumberColumns();x++)
+		{
+			fprintf(output,"%d %d %d \n", 
+					image->getPixel(x,y)->getRed(),
+					image->getPixel(x,y)->getGreen(),
+					image->getPixel(x,y)->getBlue());
+		}
+	}
+
     
 }
 

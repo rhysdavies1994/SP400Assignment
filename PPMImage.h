@@ -23,7 +23,7 @@ using namespace std;
 class PPMImage
 {
 private:
-	char magicNumber[3];
+	char magicNumber[10];
 	char comments[20];
 	int numberColumns;
 	int numberRows;
