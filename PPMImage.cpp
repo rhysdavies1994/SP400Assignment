@@ -10,36 +10,43 @@
 
 PPMImage::PPMImage()
 {
-	
 	strcpy(magicNumber,"");
 	strcpy(comments,"");
+	sourceFileName="";
 	numberColumns=0;
 	numberRows=0;
 	pixels=NULL;
 	maxRGB=0;
 }
 
+/**************************************************************************
+Function: 		(destructor)~PPMImage
+Imports:		none
+Exports:		none
+Description:	Frees all memory associated with the PPMImage
+
+**************************************************************************/
 PPMImage::~PPMImage()
 {
-	
-	
     for(int j=0;j<numberColumns;j++)
-	{
-		
+	{	
+	
 		for(int i=0;i<numberRows;i++)
 		{
-            delete pixels[j][i];
-            pixels[j][i]=NULL;
+			delete pixels[j][i];
+			pixels[j][i]=NULL;
 		}
         
         delete[] pixels[j];
         pixels[j]=NULL;
 	}
     
-    
+
 	delete[] pixels;
 	pixels=NULL;
 	
+	//	4a - without this, memory leak
+	//	free(sourceFileName);
 	
 }
 
@@ -66,21 +73,13 @@ PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB)
 
 }
 
-PPMImage::PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB, Pixel ***inPixels)
-{
-	
-	strcpy(magicNumber,"P3");
-	numberColumns=inNumberColumns;
-	numberRows=inNumberRows;
-	maxRGB=inMaxRGB;
-	pixels=inPixels;
-	
-}
 
 
 void PPMImage::initFromFile(string inputFileName)
 {
 	FILE *inputFile;
+	
+	sourceFileName = inputFileName;
 	
     Pixel *currentPixel;
     int inRed,inGreen,inBlue;
@@ -93,14 +92,13 @@ void PPMImage::initFromFile(string inputFileName)
 	
 	int progress=0;
     
-    
-    currentLine=(char*)malloc(sizeof(char)*C_LINELENGTH);
-	
 
 	
     //Open Files
     inputFile = fopen(inputFileName.c_str(), "r");
 	
+	//Vulerability 1a
+	//If magicNumber is greater than 10, it will write over fixed size of 10
 	//Get Magic Number, make sure its P3
     fscanf(inputFile ,"%s\n",magicNumber);
 	
@@ -108,10 +106,15 @@ void PPMImage::initFromFile(string inputFileName)
 		//Parse Through comments until at amount of rows and columns
 		do
 		{
+			//Vulnerability 2b
+			//if a line is over 70 characters when reading in, heap will overflow
+			currentLine=(char*)malloc(sizeof(char)*C_LINELENGTH);
+		
 			//read the current line from input image
 			fgets(currentLine, C_LINELENGTH , inputFile);
 			
 			//if the currentline is a comment, copy to output file
+			//comments have to be between magicnumber and amount rows&columns
 			if(currentLine[0] == '#')
 			{
 				strcat(comments,currentLine);
@@ -124,26 +127,15 @@ void PPMImage::initFromFile(string inputFileName)
 				isComment=false;
 			}
 			
-			//Clear currentLine from memory, then allocate for next use
-			for(int i=0;i<C_LINELENGTH;i++)
-			{
-				currentLine[i]='\0';
-			}
 			free(currentLine);
-			currentLine=(char*)malloc(sizeof(char)*C_LINELENGTH);
+			currentLine=NULL;
+			
 			
 			
 		} while(isComment==true);
 		
 		
 		//Allocate Memory for 2D array of pixels [rows][columns]
-		//pixels = new Pixel**[numberColumns];
-		//for(int j=0;j<numberColumns;j++)
-		//{
-		//	pixels[j]=new Pixel*[numberRows];
-		//	
-		//}
-
 		pixels = new Pixel**[numberColumns];
 		for(int j=0;j<numberColumns;j++)
 		{
@@ -193,14 +185,13 @@ void PPMImage::initFromFile(string inputFileName)
 					
 				}
 				
+				//4b - without this code below, memory leak
+				//When reading through input file, forget to delete current pixel
 				//delete pixel from memory
-				delete(currentPixel);
+				//delete(currentPixel);
 			
 		}
 	
-	
-	free(currentLine);
-	currentLine=NULL;
     
     //Close Files
     fclose(inputFile);
@@ -217,10 +208,8 @@ string PPMImage::toString()
 	value << maxRGB <<"\n";
 	for(int y=0;y<numberRows;y++)
 		{
-	for(int x=0;x<numberColumns;x++)
-	{
-		
-		
+		for(int x=0;x<numberColumns;x++)
+		{		
 			value << (pixels[x][y]->toString()).c_str() <<"\n";
 		}
 	}
@@ -233,10 +222,8 @@ string PPMImage::pixelsToString()
 	stringstream value;
 	for(int y=0;y<numberRows;y++)
 		{
-	for(int x=0;x<numberColumns;x++)
-	{
-		
-		
+		for(int x=0;x<numberColumns;x++)
+		{		
 			value << (pixels[x][y]->toString()).c_str() <<"\n";
 		}
 	}
@@ -269,6 +256,11 @@ int PPMImage::getNumberRows()
 int PPMImage::getMaxRGB()
 {
 	return maxRGB;
+}
+
+string PPMImage::getSourceFileName()
+{
+	return sourceFileName;
 }
 
 Pixel*** PPMImage::getPixels()

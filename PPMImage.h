@@ -25,6 +25,7 @@ class PPMImage
 private:
 	char magicNumber[10];
 	char comments[20];
+	string sourceFileName;
 	int numberColumns;
 	int numberRows;
 	int maxRGB;
@@ -34,7 +35,6 @@ private:
 public:
 	PPMImage();
 	PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB);
-	PPMImage(int inNumberColumns,int inNumberRows,int inMaxRGB, Pixel ***inPixels);
 	~PPMImage();
 	void initFromFile(string inputFileName);
 	string toString();
@@ -45,6 +45,7 @@ public:
 	int getNumberColumns();
 	int getNumberRows();
 	int getMaxRGB();
+	string getSourceFileName();
 	Pixel***  getPixels();
 	Pixel* getPixel(int column, int row);
 	void setPixel(int inRed, int inGreen, int inBlue, int column, int row);
