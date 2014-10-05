@@ -19,6 +19,6 @@ void copy(PPMImage *image, FILE *output);
 void flip(const char *direction, PPMImage *image, FILE *output);
 void resize(double scaleFactor, PPMImage *image, FILE *output);
 void tile(int amountImages,PPMImage **images, FILE *output);
-void newLine();
+void decryptImage(const char * inKey, PPMImage * inOutImage);
 
 #endif

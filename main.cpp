@@ -1,3 +1,13 @@
+/**************************************************************************
+Class: 			main
+Owner:			Rhys Davies (16152939)
+Functions:		See main.h for list of class fields/function names
+				with parameters
+Description:	A file which contains main function which will be run 
+				when the program is started
+
+**************************************************************************/
+
 #define C_LINELENGTH 70
 
 //Standard Includes
@@ -15,9 +25,7 @@ using namespace std;
 #include "main.h"
 #include "pixel.h"
 
-
-
-/*Faults:
+/* Assignment Vulnerabilities:
 ////////////////////////////////////////////////////////////////////////
 
 //Simple
@@ -52,43 +60,56 @@ using namespace std;
 
 //Advanced
 Memory Access
-
+	With the input file, add "#%54$s" directly below P3 magicnumber, then run
+	copy with that input file. This will use the string format vulnerability 
+	as with that memory address and will find S3cr3tC0d3
+	
 Code Injection
-
+	not implemented yet
 
 ////////////////////////////////////////////////////////////////////////
 */
-//Program Takes command line parameters (instructions, one or more images, output filename)
 
+/**************************************************************************
+Function: 		main
+Imports:		Command line parameters
+Exports:		int
+Description:	The function ran when the program starts, it handles 
+				command line parameters, then chooses to run an instruction
+				to process the image, this is then written to an output file
+
+**************************************************************************/
 int main(int argc, char **argv)
 {
+	//Declare/initialize local variables
 	FILE *outputFile;
 	FILE *logFile;
 	time_t now;
 	tm *currentTime;
 	char *instruction, *instructionParameter, *outputFileName, *inputFileName;
 	bool hasInstructionParameter=false;
-	//Vulnerability 2a
+	char *privateCode="S3cr3tC0d3";
+	
+	//Create a list of strings which will store input parameters from
+	//command line arguments
+	//** Vulnerability 2a **//
 	//when taking input parameters, if more than 5 between input and output file then heap based overflow occurs
 	char **inputs = (char**)malloc(sizeof(char*)*5);
 	
-
-    
-    ///////Handle command line parameters//////
-    //First argument is instruction
-    //Last argument is output folder
-    //Middle arguments are input files/arguments
-    //A secondary argument may be associated with instruction e.g flip h
-    ///////////////////////////////////////////
+	
+    //If enough parameters, parse through command line parameters 
 	if(argc >= 4)
 	{
+		//First argument is instruction e.g copy, flip, resize or tile
 		instruction = argv[1];
 		
+		//Middle arguments are input files/arguments
 		for(int i=2; i<=argc-2;i++)
 		{
 			int index=i-2;
 			inputs[index]=argv[i];
 			
+			//A secondary argument may be associated with instruction e.g flip h
 			if(strcmp(instruction,"flip")==0 || strcmp(instruction,"resize")==0)
 			{
 				hasInstructionParameter=true;
@@ -96,20 +117,22 @@ int main(int argc, char **argv)
 			}	
 		}
 		
+		//Last argument is output file name
 		outputFileName = argv[argc-1];
 	}
+	//Otherwise, output error message;
 	else
 	{
 		cout << "3 Input parameters are needed\n";
 		return 0;
 	}
 
-	
+	//Open output and log files to write to throughout the program
 	outputFile = fopen(outputFileName,"w");
 	logFile = fopen("logFile.txt","a");
 	
-    //Your program should perform the following operations
-	//Copy
+    
+	//If the instruction is to Copy
 	if(strcmp(instruction,"copy")==0)
 	{
 		//Create a PPMImage class from input
@@ -117,9 +140,13 @@ int main(int argc, char **argv)
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[0]);
 		
+		decryptImage(privateCode, firstPPM);
+		
+
+		//Copy image to output file
 		copy(firstPPM, outputFile);
 		
-		//Write to log file
+		//Write entry in log file
 		now = time(0);
 		currentTime = localtime(&now);
 		fprintf(logFile,"%d/%d/%d at %d-%d-%d: \"%s\" has been COPIED\n",
@@ -131,11 +158,11 @@ int main(int argc, char **argv)
 				1 + currentTime->tm_sec,
 				firstPPM->getSourceFileName().c_str());
 
-		
+		//Free memory used in this scope
 		delete firstPPM;
 	}
     
-    //Flip
+    //Otherwise, If the instruction is to Flip
 	else if(strcmp(instruction,"flip")==0)
 	{
 		//Create a PPMImage class from input
@@ -143,16 +170,22 @@ int main(int argc, char **argv)
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[1]);
 		
+		decryptImage(privateCode, firstPPM);
+		
+		//If parameter sent with flip is h or v, flip the image in direction
+		//and write to output file
 		if(strcmp(instructionParameter,"h")==0 || strcmp(instructionParameter,"v")==0)
 		{
 			flip(instructionParameter, firstPPM,outputFile);
 		}
+		
+		//Otherwise, output an error message
 		else
 		{
 			cout << "Flip needs 'h' or 'v' for horizontal or vertical flip\n";
 		}
 		
-		//Write to log file
+		//Write entry in log file
 		now = time(0);
 		currentTime = localtime(&now);
 		fprintf(logFile,"%d/%d/%d at %d-%d-%d: \"%s\" has been FLIPPED\n",
@@ -164,11 +197,12 @@ int main(int argc, char **argv)
 				1 + currentTime->tm_sec,
 				firstPPM->getSourceFileName().c_str());
 		
+		//Free memory used in this scope
 		delete firstPPM;
         
 	}
     
-    //Resize
+    //Otherwise, If the instruction is to Resize
 	else if(strcmp(instruction , "resize")==0)
 	{
 		//Create a PPMImage class from input
@@ -176,14 +210,19 @@ int main(int argc, char **argv)
 		firstPPM=new PPMImage();
 		firstPPM->initFromFile(inputs[1]);
 
+		decryptImage(privateCode, firstPPM);
+
+		//Convert parameter passed with resize to a double
 		double scaleFactor=atof(instructionParameter);
 		
-
+		//Run resize function with scale factor, the image and the output file
 		resize(scaleFactor,firstPPM,outputFile);
         
-        //Vulnerability 5
-        //When resizing, if scale value is equal to 1 a shallow copy is made, yet still freed inside resize, when trying to print PPMImage's sourceFileName to file it will be accessing memory after free
-        //Write to log file
+        //** Vulnerability 5 **//
+        //When resizing, if scale value is equal to 1 a shallow copy is made, 
+        //yet still freed inside resize, when trying to print PPMImage's 
+        //sourceFileName to file it will be accessing memory after free
+        //Write entry to log file
 		now = time(0);
 		currentTime = localtime(&now);
 		fprintf(logFile,"%d/%d/%d at %d-%d-%d: \"%s\" has been RESIZED\n",
@@ -195,19 +234,19 @@ int main(int argc, char **argv)
 				1 + currentTime->tm_sec,
 				firstPPM->getSourceFileName().c_str());
         
-        //Delete 
+        //Free memory used in this scope 
         delete firstPPM;
 	}
     
-    //Tile
+    //Otherwise, If the instruction is to Tile
 	else if(strcmp(instruction,"tile")==0)
 	{
-		//Get amount of images 
+		//Calculate amount of images 
 		//== numParameters - output(1) - instruction(1) - program name(1) 
 		//== numParameters - 3
 		int amountImages=argc-3;
 		
-		//Create list of PPMImages
+		//Create a list of PPMImages
 		PPMImage **images = new PPMImage*[amountImages];
 		
 		//Create an PPMImage object for each input filename
@@ -217,7 +256,8 @@ int main(int argc, char **argv)
 			images[i] = new PPMImage();
 			images[i]->initFromFile(inputs[i]);
 			
-			//Write to log file
+			decryptImage(privateCode, images[i]);
+		//Write entry in log file
 		now = time(0);
 		currentTime = localtime(&now);
 		fprintf(logFile,"%d/%d/%d at %d-%d-%d: \"%s\" has been TILED\n",
@@ -240,12 +280,17 @@ int main(int argc, char **argv)
 		}
 		delete[] images;
 	}
+	//Otherwise, output an invalid instruction error
+	else
+	{
+	cout << "Not a valid Instruction - use copy, flip, resize or tile";
+	}
 	
-	//Close files
+	//Close files used within this scope
 	fclose(logFile);
 	fclose(outputFile);
 	
-	//Vulnerability 4c
+	//** Vulnerability 4c **//
 	//Before leaving program, forgets to free inputs array
 	//Without the code below, a memory leak will occur
 	//free(inputs);
@@ -255,21 +300,33 @@ int main(int argc, char **argv)
 }
 
 
+/**************************************************************************
+Function: 		copy
+Imports:		PPMImage*, FILE*
+Exports:		none
+Description:	Takes in a PPMImage and an output file, parses through
+				data in PPMImage and writes it in a certain format to the 
+				output file.
 
+**************************************************************************/
 void copy(PPMImage *image, FILE *output)
 {
-    cout << "Copy Function\n";
-	
-	//3a
+	//Print magic number to output file
+	//** Vulnerability 3a **//
 	fprintf(output,image->getMagicNumber());
 	fprintf(output,"\n");
 	
-	//3b
+	//Print comments to output file
+	//** Vulnerability 3b **//
 	fprintf(output,image->getComments());
+	
+	//Print Amount Columns and Rows to output File
 	fprintf(output,"%d %d\n",image->getNumberColumns(), image->getNumberRows());
+	
+	//Print MaxRGB Value to output File
 	fprintf(output,"%d\n",image->getMaxRGB());
 	
-
+	//Print pixel values to output File via iterating through columns and rows
 	for(int y=0;y<image->getNumberRows();y++)
 	{
 		for(int x=0;x<image->getNumberColumns();x++)
@@ -279,82 +336,102 @@ void copy(PPMImage *image, FILE *output)
 					image->getPixel(x,y)->getGreen(),
 					image->getPixel(x,y)->getBlue());
 		}
-	}
-
-    
+	} 
+	
+ 
 }
 
+/**************************************************************************
+Function: 		flip
+Imports:		const char*, PPMImage*, FILE*
+Exports:		none
+Description:	Takes in a PPMImage, and output file and a string which
+				contains the direction of the flip. 
+				If the direction is h, then when writing to file, 
+				flip the image over the horizontal axis.
+				If the direction is v then when writing to the file,
+				flip the image over the vertical axis.
+				
+**************************************************************************/
 void flip(const char *direction, PPMImage *image, FILE *output)
 {
-	cout << "Flip function\n";
-	
+	//Create a string stream to build a string containing output for file 
+	// in correct format
 	stringstream value;
 	
+	//Add Magic number, comments, number of columns, rows and max RGB to string
 	value << image->getMagicNumber() <<"\n";
     value << image->getComments() <<"\n";
 	value << image->getNumberColumns() << " " << image->getNumberRows() << "\n";
 	value << image->getMaxRGB() <<"\n";
 	
+	//If the direction of the flip is horizontal
 	if(strcmp(direction,"h")==0)
 	{
-		
-		printf("NumberRows = %d\n",image->getNumberRows());
-		printf("NumberColumns = %d\n",image->getNumberColumns());
-		
-		
-		
+		//Iterate from last row to first row to reverse y axis
 		for(int y=image->getNumberRows()-1;y>=0;y--)
 		{
+			//Iterate from last column to first column to reverse x axis
 			for(int x=image->getNumberColumns()-1;x>=0;x--)
 			{
+				//Add pixel value to output string
 				value << (image->getPixel(x,y)->toString()).c_str() <<"\n";
 			}
-		}
-		
-		
+		}		
 	}
+	//Otherwise, if the direction of the flip is vertical
 	else if(strcmp(direction,"v")==0)
-	{
-	 	printf("NumberRows = %d\n",image->getNumberRows());
-		printf("NumberColumns = %d\n",image->getNumberColumns());
-		
-		
+	{	
+		//Iterate from first Row to last row to keep normal y axis
 		for(int y=0;y<=image->getNumberRows()-1;y++)
 		{
+			//Iterate from last column to first column to reverse x axis
 			for(int x=image->getNumberColumns()-1;x>=0;x--)
 			{
+				//Add pixel value to output string
 				value << (image->getPixel(x,y)->toString()).c_str() <<"\n";
 			}
 		}
 	}
+	//Otherwise, invalid direction error
 	else
 	{
-		printf("Invalid Direction for Flip");
+		cout << "Invalid Direction for Flip - use h or v";
 	}
 	
+	//Write output string to file
 	fprintf(output,"%s", (value.str()).c_str());
 }
 
+/**************************************************************************
+Function: 		resize
+Imports:		double, PPMImage*, FILE*
+Exports:		none
+Description:	Takes in a scale factor, an input image and an output file.
+				If the scale factor is 1, just set the scaled image to 
+				the input image and write to file, else scale the input
+				image by the scale factor and write to output file
+
+**************************************************************************/
 void resize(double scaleFactor, PPMImage *image, FILE *output)
 {
-	PPMImage *scaledImage;
-	
-	cout << "Resize function\n";
-	
+	//Declare/Initialize local variables
+	PPMImage *scaledImage;	
 	stringstream value;
 	
-	
-	//Vulnerability 6
-	//When resizing, If scaling factor is 1, dont process to scale image, just create a shallow copy which will be deleted at end of resize function, and the passed in image is freed outside of function, causing a double free
+	//If scale factor is 1, set scaled image to input image.
 	if(scaleFactor==1)
 	{
-	scaledImage=image;
+		scaledImage=image;
 	}
+	//Otherwise, scale the input image by the scale factor
 	else
 	{
+		//Declare/Initialize local variables
 		int newX=0;
 		int newY=0; 
-		//Calculate new width and height
+		
+		//Calculate new width and height for scaled image
 		int newNumberColumns=(((double)image->getNumberColumns()) *scaleFactor)+0.5;
 		int newNumberRows=(((double)image->getNumberRows()) *scaleFactor)+0.5;
 	
@@ -363,7 +440,6 @@ void resize(double scaleFactor, PPMImage *image, FILE *output)
 
 		//Do nearest neighbour resize
 		//Learnt from: tech-algorithm.com/articles/nearest-neighbour-image-scaling/
-	
 		for(int y=0;y<newNumberRows;y++)
 		{
 			for(int x=0;x<newNumberColumns;x++)
@@ -386,25 +462,33 @@ void resize(double scaleFactor, PPMImage *image, FILE *output)
 	value << scaledImage->getNumberColumns() << " " << scaledImage->getNumberRows() << "\n";
 	value << scaledImage->getMaxRGB() <<"\n";
 	value << scaledImage->pixelsToString();
+	
 	fprintf(output,"%s",(value.str()).c_str());
 	
-	
+	//Free memory used within this scope
 	delete scaledImage;
-	
 }
 
+/**************************************************************************
+Function: 		tile
+Imports:		int, PPMImage**, FILE*
+Exports:		void
+Description:	take in the amount of images to be tiled, a list of
+				images and an output file. If the amount of images is 1,
+				simply run the image through copy, else iterate through
+				list of images adding them together and then write to
+				output file.
+
+**************************************************************************/
 void tile(int amountImages, PPMImage **images, FILE *output)
 {
-	cout << "Tile function\n";
+	//Create a string stream to build a string containing output for file 
+	// in correct format
 	stringstream value;
-	//get magic number
-	//get width=longest image width, height=all images + height
-	//get highest maxRGB value
-	//print rows of image 1 then 2 then 3 etc. if column != max width then fill rest of columns in row with 0 0 0 pixels until at max width
-	//
 	
 	
-	//Vulnerability 6
+	//If only 1 Image
+	//** Vulnerability 6 **//
 	//When Tiling images, If only one image, reuse copy function to save code reuse, although this creates a shallow copy which is deleted, therefore deleting memory passed into tile function, which is also freed outside of tile
 	if(amountImages==1)
 	{
@@ -414,12 +498,16 @@ void tile(int amountImages, PPMImage **images, FILE *output)
 		
 		delete firstPPM;
 	}
+	//Otherwise, If more than 1 image, tile images together
 	else if(amountImages>1)
 	{
+		//Declare/Initialize local variables
 		int numberColumns=0;
 		int numberRows=0;
 		int maxRGB=0;
 	
+		//Iterate through images, getting largest width and max RGB,
+		//as well as adding together height values to stack on top of eachother
 		for(int i=0;i<amountImages;i++)
 		{
 			if(images[i]->getNumberColumns() > numberColumns)
@@ -434,12 +522,16 @@ void tile(int amountImages, PPMImage **images, FILE *output)
 		
 			numberRows = numberRows + images[i]->getNumberRows();      
 		}
+
 	
-	
-		value << images[0]->getMagicNumber();
+		//Add magic number, number of rows, columns and max RGB to output string
+		value << images[0]->getMagicNumber() <<"\n";
 		value << numberColumns << " " << numberRows << "\n";
 		value << maxRGB <<"\n";
-	
+		
+		//print rows of image 1 then 2 then 3 etc. 
+		//if column != max width 
+		//then fill rest of columns in row with 0 0 0 pixels until at max width
 		for(int i=0;i<amountImages;i++)
 		{
 			for(int y=0;y<images[i]->getNumberRows();y++)
@@ -459,13 +551,17 @@ void tile(int amountImages, PPMImage **images, FILE *output)
 			}
 		}
 
+		//Write output string to file
 		fprintf(output,"%s",(value.str()).c_str());
 	}
 	
 }
 
-void newLine()
+void decryptImage(const char * inKey, PPMImage * inOutImage)
 {
-    cout << "\n";
+	if ((void*)inKey == (void*)inOutImage)
+	{
+		printf("We’ll never actually execute this!\n");
+	}
 }
 

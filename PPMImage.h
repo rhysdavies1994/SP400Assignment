@@ -1,11 +1,3 @@
-//
-//  PPMImage.h
-//  
-//
-//  Created by Rhys Jordan Davies on 27/09/2014.
-//
-//
-
 #ifndef ____PPMImage__
 #define ____PPMImage__
 
@@ -24,7 +16,7 @@ class PPMImage
 {
 private:
 	char magicNumber[10];
-	char comments[20];
+	char comments[200];
 	string sourceFileName;
 	int numberColumns;
 	int numberRows;

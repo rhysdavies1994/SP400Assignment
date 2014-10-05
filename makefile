@@ -5,7 +5,7 @@ obj=$(main).o pixel.o PPMImage.o
 cc=g++ -c -ggdb
 
 $(main):    $(obj)
-	$(CFLAGS) -o $(main) $(obj)
+	$(CFLAGS) -o CCSEPAssignment $(obj)
 
 $(main).o: pixel.o PPMImage.o
 	$(cc) $(main).cpp
