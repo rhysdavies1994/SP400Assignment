@@ -1647,3 +1647,11 @@
 5/10/2014 at 18-49-17: "secretCode.ppm" has been COPIED
 5/10/2014 at 18-54-31: "secretCode.ppm" has been FLIPPED
 5/10/2014 at 18-60-33: "secretCode.ppm" has been COPIED
+5/10/2014 at 19-7-26: "examples/computing.ppm" has been COPIED
+5/10/2014 at 19-7-40: "examples/computing.ppm" has been FLIPPED
+5/10/2014 at 19-7-48: "examples/library.ppm" has been FLIPPED
+5/10/2014 at 19-7-56: "examples/pavilion.ppm" has been RESIZED
+5/10/2014 at 19-8-1: "examples/pavilion.ppm" has been RESIZED
+5/10/2014 at 19-8-9: "examples/computing.ppm" has been TILED
+5/10/2014 at 19-8-10: "examples/library.ppm" has been TILED
+5/10/2014 at 19-8-10: "examples/pavilion.ppm" has been TILED
