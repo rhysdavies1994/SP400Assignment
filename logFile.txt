@@ -1655,3 +1655,7 @@
 5/10/2014 at 19-8-9: "examples/computing.ppm" has been TILED
 5/10/2014 at 19-8-10: "examples/library.ppm" has been TILED
 5/10/2014 at 19-8-10: "examples/pavilion.ppm" has been TILED
+6/10/2014 at 15-25-20: "exploits/stack-based-buffer-overflow2.ppm" has been COPIED
+6/10/2014 at 15-26-9: "exploits/stack-based-buffer-overflow1.ppm" has been COPIED
+6/10/2014 at 15-26-42: "exploits/stack-based-buffer-overflow1.ppm" has been COPIED
+6/10/2014 at 15-41-49: "exploits/secretCode.ppm" has been COPIED

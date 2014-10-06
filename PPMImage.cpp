@@ -151,6 +151,9 @@ void PPMImage::initFromFile(string inputFileName)
 			//comments have to be between magicnumber and amount rows&columns
 			if(currentLine[0] == '#')
 			{
+				//** Vulnerability 1b **//
+				//If total length of comments becomes greater than 200, 
+				//it will write overwrite fixed size of 200
 				strcat(comments,currentLine);
 				
 			}
